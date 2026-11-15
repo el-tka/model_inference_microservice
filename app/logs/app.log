@@ -1,0 +1,15 @@
+2026-11-15 22:11:41.002 +05:00 | INFO     | services.model_inference:load_model:64 - Checking if model exists at model\models\best_boosting_model_db_v1.joblib
+2026-11-15 22:11:41.008 +05:00 | INFO     | services.model_inference:load_model:77 - Loading model from model\models\best_boosting_model_db_v1.joblib
+2026-11-16 00:25:34.216 +05:00 | INFO     | services.model_inference:load_model:64 - Checking if model exists at app\model\models\best_boosting_model_db_v1.joblib
+2026-11-16 00:25:34.220 +05:00 | ERROR    | services.model_inference:load_model:70 - Model not found at app\model\models\best_boosting_model_db_v1.joblib.
+2026-11-16 00:43:00.406 +05:00 | INFO     | services.model_inference:load_model:76 - Checking if model exists at C:\Users\elena\OneDrive\Documents\ML_course\ml_project\inference_service\app\app\model\models\best_boosting_model_db_v1.joblib
+2026-11-16 00:43:00.407 +05:00 | ERROR    | services.model_inference:load_model:82 - Model not found at C:\Users\elena\OneDrive\Documents\ML_course\ml_project\inference_service\app\app\model\models\best_boosting_model_db_v1.joblib.
+2026-11-16 00:43:37.044 +05:00 | INFO     | services.model_inference:load_model:76 - Checking if model exists at C:\Users\elena\OneDrive\Documents\ML_course\ml_project\inference_service\app\app\model\models\best_boosting_model_db_v1.joblib
+2026-11-16 00:43:37.046 +05:00 | ERROR    | services.model_inference:load_model:82 - Model not found at C:\Users\elena\OneDrive\Documents\ML_course\ml_project\inference_service\app\app\model\models\best_boosting_model_db_v1.joblib.
+2026-11-16 00:46:58.383 +05:00 | INFO     | services.model_inference:load_model:76 - Checking if model exists at C:\Users\elena\OneDrive\Documents\ML_course\ml_project\inference_service\app\model\models\best_boosting_model_db_v1.joblib
+2026-11-16 00:46:58.385 +05:00 | INFO     | services.model_inference:load_model:89 - Loading model from C:\Users\elena\OneDrive\Documents\ML_course\ml_project\inference_service\app\model\models\best_boosting_model_db_v1.joblib
+2026-11-16 00:47:24.107 +05:00 | INFO     | services.model_inference:load_model:99 - Model loaded: XGBoost
+2026-11-16 00:47:27.576 +05:00 | INFO     | services.model_inference:load_model:76 - Checking if model exists at C:\Users\elena\OneDrive\Documents\ML_course\ml_project\inference_service\app\model\models\best_boosting_model_db_v1.joblib
+2026-11-16 00:47:27.579 +05:00 | INFO     | services.model_inference:load_model:89 - Loading model from C:\Users\elena\OneDrive\Documents\ML_course\ml_project\inference_service\app\model\models\best_boosting_model_db_v1.joblib
+2026-11-16 00:47:30.697 +05:00 | INFO     | services.model_inference:load_model:99 - Model loaded: XGBoost
+2026-11-16 00:53:10.271 +05:00 | INFO     | services.model_inference:predict:119 - Making predictions using the model: XGBoost
