@@ -23,8 +23,6 @@ def create_app(load_model=True):
 
     app.config["MAX_CONTENT_LENGTH"] = 16 * 1024
 
-    
-
     CORS(
         app,
         resources={
@@ -38,7 +36,6 @@ def create_app(load_model=True):
             }
         },
     )
-
 
     app.register_blueprint(health_bp)
     app.register_blueprint(prediction_bp)
