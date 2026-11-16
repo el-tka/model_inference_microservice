@@ -12,6 +12,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 CONFIG_DIR = Path(__file__).resolve().parent
+BASE_DIR = CONFIG_DIR.parent.parent
+
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class LoggerSettings(BaseSettings):
@@ -45,7 +49,7 @@ def configure_logging(log_level: str) -> None:
     """
     logger.remove()  # Remove the default logger to avoid duplicate logs
     logger.add(
-        "logs/app.log",
+        LOG_DIR / "app.log",
         rotation="1 day",
         retention="2 days",
         compression="zip",

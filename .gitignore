@@ -1,0 +1,11 @@
+.vscode/
+*.zip
+
+# Logging
+app/logs/*.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env

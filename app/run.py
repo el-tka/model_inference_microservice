@@ -10,11 +10,16 @@ Usage:
 """
 
 from flask import Flask
+from loguru  import logger
 
 from api.prediction import bp
 
 app = Flask(__name__)
 app.register_blueprint(bp)
 
+logger.info("Flask application initialized")
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    logger.info("Starting inference microservice")
+
+    app.run(debug=True, use_reloader=False,)
