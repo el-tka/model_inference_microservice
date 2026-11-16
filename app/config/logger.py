@@ -35,7 +35,7 @@ class LoggerSettings(BaseSettings):
         extra="ignore",
     )
 
-    log_level: str
+    log_level: str = "INFO"
 
 
 def configure_logging(log_level: str) -> None:
