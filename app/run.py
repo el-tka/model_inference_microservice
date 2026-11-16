@@ -10,16 +10,46 @@ Usage:
 """
 
 from flask import Flask
-from loguru  import logger
+from loguru import logger
 
-from api.prediction import bp
+from api.health import bp as health_bp
+from api.prediction import bp as prediction_bp
+from services import initialize_model
 
-app = Flask(__name__)
-app.register_blueprint(bp)
 
-logger.info("Flask application initialized")
+def create_app(load_model=True):
+    app = Flask(__name__)
 
-if __name__ == '__main__':
-    logger.info("Starting inference microservice")
+    app.config["MAX_CONTENT_LENGTH"] = 16 * 1024
 
-    app.run(debug=True, use_reloader=False,)
+    from flask_cors import CORS
+
+    CORS(
+        app,
+        resources={
+            r"/api/*": {
+                "origins": ["http://localhost:3000"]
+            }
+        },
+    )
+
+    app.register_blueprint(health_bp)
+    app.register_blueprint(prediction_bp)
+
+    
+    if load_model:
+        initialize_model()
+
+    return app
+
+
+app = create_app()
+
+if __name__ == "__main__":
+    logger.info("Starting ML inference API")
+    app.run(
+        host="127.0.0.1",
+        port=5000,
+        debug=False,
+        use_reloader=False,
+    )

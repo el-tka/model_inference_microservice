@@ -1,24 +1,24 @@
 # This is my first GitHub Actions workflow!
 
-name: Lint Workflow
+name: ML Inference CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [main]
   pull_request:
-    branches: ["main"]
+    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
-  lint:
+  quality:
     runs-on: ubuntu-24.04
 
     env:
       POETRY_VIRTUALENVS_IN_PROJECT: "true"
       POETRY_VIRTUALENVS_CREATE: "true"
-
+      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,5 +26,11 @@ jobs:
       - name: Build application
         uses: ./.github/actions/build-application
 
-      - name: Lint with Flake8
-        run: poetry run flake8 app/
+      - name: Lint
+        run: poetry run flake8 app/ tests/
+
+      - name: Run tests
+        run: poetry run pytest tests/ -v
+
+      - name: Test coverage
+        run: poetry run pytest --cov=app tests/

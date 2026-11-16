@@ -35,12 +35,9 @@ class ModelSettings(BaseSettings):
         extra="ignore",
     )
 
-    model_output_path: str
-    model_results_path: str
-    model_name: str
-    model_results_name: str
-    random_state: int
+    model_output_path: str = "model/models"
+    model_name: str = "best_boosting_model_db_v1.joblib"
 
 
-# Initialize settings and configure logging
 model_settings = ModelSettings()
+

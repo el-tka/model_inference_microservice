@@ -6,6 +6,7 @@ variables and .env file.
 """
 
 from pathlib import Path
+import sys
 
 from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -47,13 +48,25 @@ def configure_logging(log_level: str) -> None:
     Returns:
         None
     """
-    logger.remove()  # Remove the default logger to avoid duplicate logs
+    logger.remove()
+
+    logger.add(
+        sys.stderr,
+        level=log_level,
+        format=(
+            "{time:YYYY-MM-DD HH:mm:ss} | "
+            "{level} | {name}:{function}:{line} | "
+            "{message}"
+        ),
+    )
+
     logger.add(
         LOG_DIR / "app.log",
-        rotation="1 day",
-        retention="2 days",
+        rotation="10 MB",
+        retention="7 days",
         compression="zip",
         level=log_level,
+        enqueue=True,
     )
 
 

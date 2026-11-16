@@ -1,11 +1,30 @@
-.vscode/
-*.zip
-
-# Logging
-app/logs/*.log
-
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
 .venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environment
 .env
+.env.*
+!.env.example
+app/config/.env
+
+# Logs
+logs/
+app/logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Archives
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db

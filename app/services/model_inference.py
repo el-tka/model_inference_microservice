@@ -100,39 +100,43 @@ class ModelInferenceService:
             f'Model loaded: {self.model_name}',
             )
 
-    def predict(self,
-                input_variables: list,) -> np.ndarray:
-        """Makes predictions using the loaded model based on the provided
+    def predict(self, input_variables: dict) -> np.ndarray:
+        """
+        Makes predictions using the loaded model based on the provided
         input variables.
-       
+        
         Takes a list of input variables, converts them into a DataFrame, and
         uses the loaded model to make predictions.
         Returns the predictions as a NumPy array.
 
         Args:
-        input_variables (list): A list of input variables for making
+        input_variables (dict): A dictionary of input variables for making
         predictions.
 
         Returns:
         numpy.ndarray: An array of predictions made by the model.
         """
-        logger.info(
-            f'Making predictions using the model: {self.model_name}',
-        )
 
         if self.model is None:
-            logger.error(
-                'Model is not loaded. Call load_model() first.',
-            )
-            raise ValueError('Model is not loaded. Call load_model() first.')
+            logger.error("Model is not loaded")
+            raise RuntimeError("Model is not loaded")
 
-        # Convert input to DataFrame
-        x = pd.DataFrame(
-            [input_variables],
-            columns=self.features,
+        if not self.features:
+            raise RuntimeError("Model features are not loaded")
+
+        missing = set(self.features) - set(input_variables)
+
+        if missing:
+            raise ValueError(
+                f"Missing model features: {sorted(missing)}"
+            )
+
+        x = pd.DataFrame([input_variables])
+        x = x.loc[:, self.features]
+
+        logger.info(
+            "Making prediction using model: {}",
+            self.model_name,
         )
 
-        predictions = self.model.predict(x)
-
-        return predictions
-
+        return self.model.predict(x)

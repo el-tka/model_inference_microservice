@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Apartment Price Prediction</title>
+</head>
+<body>
+  <h1>Apartment Price Prediction</h1>
+
+  <button onclick="predictPrice()">
+    Predict price
+  </button>
+
+  <p id="result"></p>
+
+  <script>
+    async function predictPrice() {
+      const apartment = {
+        area: 75,
+        constraction_year: 2015,
+        bedrooms: 2,
+        garden: 0,
+        balcony_yes: 1,
+        parking_yes: 1,
+        furnished_yes: 1,
+        garage_yes: 0,
+        storage_yes: 1
+      };
+
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/v1/predict",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(apartment)
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || "Prediction failed"
+          );
+        }
+
+        document.getElementById("result")
+          .textContent =
+            `Predicted price: ${data.prediction}`;
+
+      } catch (error) {
+        document.getElementById("result")
+          .textContent = error.message;
+      }
+    }
+  </script>
+</body>
+</html>

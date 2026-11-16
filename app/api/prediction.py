@@ -19,10 +19,11 @@ Endpoints:
         Returns HTTP status 400 if input parameters are invalid.
 """
 
-from flask import abort, Blueprint, request
+from flask import abort, Blueprint, jsonify, request
 from pydantic import ValidationError
 
 from schema.apartment import Apartment
+from services.model_inference import ModelInferenceService
 from services import model_inference_service
 
 
@@ -43,27 +44,52 @@ def get_prediction():
         abort(code=400, description='Bad input parameters')  # noqa: WPS432
 
     prediction = model_inference_service.predict(
-        list(apartment_features.model_dump().values()),
+        apartment_features.model_dump()
     )
 
     return {'Model prediction': prediction.tolist()}
 
 
-@bp.post('/')
+@bp.post("/")
 def get_prediction_post():
     """
-    Return a prediction based on the JSON data.
+        Return a prediction based on the JSON data.
+    
+        Returns:
+            json: A json containing the prediction result.
+        """
+    payload = request.get_json(silent=True)
 
-    Returns:
-        dict: A dictionary containing the prediction result.
-    """
+    if payload is None or payload == {}:
+        return jsonify({
+            "error": "Request body is empty"
+        }), 400
+
+    if not isinstance(payload, dict):
+        return jsonify({
+            "error": "JSON body must be an object"
+        }), 400
+
     try:
-        apartment_features = Apartment(**request.get_json(silent=True))
-    except ValidationError:
-        abort(code=400, description='Bad json input')  # noqa: WPS432
+        apartment = Apartment.model_validate(payload)
 
-    prediction = model_inference_service.predict(
-        list(apartment_features.model_dump().values()),
+    except ValidationError as exc:
+        return jsonify({
+            "error": "Validation error",
+            "details": exc.errors(
+                include_context=False,
+                include_input=False,
+            ),
+        }), 422
+
+    service = ModelInferenceService()
+    service.load_model()
+
+    prediction = service.predict(
+        apartment.model_dump()
     )
 
-    return {'Model prediction': prediction.tolist()}
+    return jsonify({
+        "prediction": prediction.tolist()
+    }), 200
+
