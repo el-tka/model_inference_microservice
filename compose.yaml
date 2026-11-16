@@ -1,18 +1,17 @@
 services:
-  inference-api:
+
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
-
-    container_name: ml-inference-api
-
-    ports:
-      - "127.0.0.1:5000:5000"
 
     environment:
       MODEL_OUTPUT_PATH: model/models
       MODEL_NAME: best_boosting_model_db_v1.joblib
       LOG_LEVEL: INFO
+
+    expose:
+      - "5000"
 
     restart: unless-stopped
 
@@ -21,8 +20,22 @@ services:
         - CMD
         - python
         - -c
-        - "import urllib.request; urllib.request.urlopen('http://localhost:5000/ready', timeout=5)"
+        - "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=5)"
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    ports:
+      - "3000:80"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    restart: unless-stopped

@@ -1,61 +1,744 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Apartment Price Prediction</title>
-</head>
-<body>
-  <h1>Apartment Price Prediction</h1>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <button onclick="predictPrice()">
-    Predict price
-  </button>
+  <title>ESTATE / AI — Оценка недвижимости</title>
 
-  <p id="result"></p>
+  <style>
+    :root {
+      --ink: #172c2b;
+      --muted: #70807a;
+      --paper: #f7f7f3;
+      --line: #dce3dd;
+      --green: #244e43;
+      --accent: #d8e5d9;
+    }
 
-  <script>
-    async function predictPrice() {
-      const apartment = {
-        area: 75,
-        constraction_year: 2015,
-        bedrooms: 2,
-        garden: 0,
-        balcony_yes: 1,
-        parking_yes: 1,
-        furnished_yes: 1,
-        garage_yes: 0,
-        storage_yes: 1
-      };
+    * {
+      box-sizing: border-box;
+    }
 
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/v1/predict",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(apartment)
-          }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 15px/1.5 Inter, "Segoe UI", Arial, sans-serif;
+    }
+
+    header {
+      min-height: 78px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px max(24px, calc((100vw - 1240px) / 2));
+      background: #fff;
+    }
+
+    .brand {
+      font-family: Georgia, serif;
+      font-size: 24px;
+      letter-spacing: 2px;
+    }
+
+    .brand span {
+      display: block;
+      color: var(--muted);
+      font: 10px "Segoe UI", Arial, sans-serif;
+      letter-spacing: 3px;
+    }
+
+    .top-tag {
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 54px 24px 90px;
+    }
+
+    .eyebrow {
+      color: #658478;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 50px;
+      align-items: center;
+      margin-bottom: 42px;
+    }
+
+    .hero h1 {
+      font: normal clamp(36px, 5vw, 65px)/1.06 Georgia, serif;
+      letter-spacing: -2px;
+      margin: 14px 0 17px;
+    }
+
+    .hero p {
+      max-width: 580px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .hero-art {
+      height: 210px;
+      border-radius: 5px;
+      background:
+        linear-gradient(145deg, #234d44b8, #0f2c2fdd),
+        radial-gradient(
+          circle at 70% 20%,
+          #d6e4d4 0,
+          transparent 50%
         );
+      position: relative;
+      overflow: hidden;
+    }
 
-        const data = await response.json();
+    .hero-art::before {
+      content: "";
+      position: absolute;
+      inset: 35px 65px 0 65px;
+      border: 1px solid #b4c9b7;
+      transform: skewY(-14deg);
+      box-shadow:
+        28px 28px 0 -1px #2e5d53,
+        28px 28px 0 0 #b4c9b7,
+        55px 55px 0 -1px #2e5d53,
+        55px 55px 0 0 #b4c9b7;
+    }
 
-        if (!response.ok) {
-          throw new Error(
-            data.error || "Prediction failed"
-          );
-        }
+    .hero-art::after {
+      content: "AI / PROPERTY INTELLIGENCE";
+      position: absolute;
+      bottom: 20px;
+      left: 22px;
+      color: #e5eee7;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
 
-        document.getElementById("result")
-          .textContent =
-            `Predicted price: ${data.prediction}`;
+    .workspace {
+      display: grid;
+      grid-template-columns:
+        minmax(0, 1.55fr)
+        minmax(310px, 0.85fr);
+      gap: 25px;
+      align-items: start;
+    }
 
-      } catch (error) {
-        document.getElementById("result")
-          .textContent = error.message;
+    .panel {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 12px 40px #1a39350a;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .panel h2 {
+      font: normal 27px Georgia, serif;
+      margin: 0;
+    }
+
+    .step {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #81928a;
+      text-transform: uppercase;
+      margin: 26px 0 16px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 17px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .field input {
+      width: 100%;
+      height: 47px;
+      padding: 0 12px;
+      border: 1px solid #d7dfd9;
+      border-radius: 6px;
+      background: #fafcf9;
+      color: var(--ink);
+      font: inherit;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: #527c6a;
+      box-shadow: 0 0 0 3px #dce9df;
+    }
+
+    .toggles {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 12px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      background: #fff;
+    }
+
+    .toggle:has(input:checked) {
+      background: #edf5ee;
+      border-color: #8ab09a;
+    }
+
+    .toggle input {
+      accent-color: #285948;
+      width: 16px;
+      height: 16px;
+    }
+
+    .submit {
+      margin-top: 28px;
+      width: 100%;
+      height: 53px;
+      background: var(--green);
+      color: #fff;
+      border: 0;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .submit:hover {
+      background: #356657;
+    }
+
+    .submit:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+    .side {
+      position: sticky;
+      top: 20px;
+    }
+
+    .result {
+      background: var(--green);
+      color: #fff;
+      border-radius: 10px;
+      padding: 32px;
+      min-height: 270px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result::after {
+      content: "◌";
+      position: absolute;
+      right: -25px;
+      top: 15px;
+      font-size: 190px;
+      color: #ffffff12;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .result .eyebrow {
+      color: #b8d0c1;
+    }
+
+    .result h2 {
+      font: normal 26px Georgia, serif;
+      margin: 20px 0 10px;
+    }
+
+    .value {
+      font: normal clamp(28px, 3vw, 44px) Georgia, serif;
+      margin: 14px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #b8d0c1;
+      max-width: 270px;
+    }
+
+    .status {
+      margin-top: 28px;
+      border-top: 1px solid #ffffff35;
+      padding-top: 16px;
+      font-size: 12px;
+      color: #d8e9dd;
+    }
+
+    .note {
+      margin-top: 20px;
+      padding: 20px;
+      background: #eaf0e9;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #5b7167;
+    }
+
+    .note strong {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 5px;
+    }
+
+    .footer {
+      margin-top: 38px;
+      color: #87948b;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    #error {
+      color: #a03d34;
+      font-size: 12px;
+      margin-top: 12px;
+      min-height: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-art {
+        display: none;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .side {
+        position: static;
       }
     }
-  </script>
+
+    @media (max-width: 540px) {
+      header {
+        padding: 15px 20px;
+      }
+
+      .top-tag {
+        display: none;
+      }
+
+      main {
+        padding: 36px 15px;
+      }
+
+      .panel {
+        padding: 20px;
+      }
+
+      .fields,
+      .toggles {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .hero h1 {
+        letter-spacing: -1px;
+      }
+
+      .footer {
+        display: block;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">
+    ESTATE / AI
+    <span>INTELLIGENT VALUATION</span>
+  </div>
+
+  <div class="top-tag">
+    PROPERTY ANALYTICS · ML POWERED
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div>
+      <div class="eyebrow">
+        Machine learning · Real estate
+      </div>
+
+      <h1>
+        Узнайте стоимость<br>
+        вашей недвижимости.
+      </h1>
+
+      <p>
+        Интеллектуальная оценка на основе характеристик
+        квартиры. Заполните форму, и ML-модель рассчитает
+        прогноз за несколько секунд.
+      </p>
+    </div>
+
+    <div class="hero-art" aria-hidden="true"></div>
+  </section>
+
+  <div class="workspace">
+
+    <section class="panel">
+
+      <div class="panel-head">
+        <h2>Параметры квартиры</h2>
+        <span class="step">01 / Оценка</span>
+      </div>
+
+      <form id="form">
+
+        <div class="section-label">
+          Основные характеристики
+        </div>
+
+        <div class="fields">
+
+          <div class="field">
+            <label for="area">Площадь, м²</label>
+            <input
+              id="area"
+              type="number"
+              min="1"
+              max="1000"
+              value="75"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="constraction_year">
+              Год постройки
+            </label>
+            <input
+              id="constraction_year"
+              type="number"
+              min="1800"
+              max="2031"
+              value="2015"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="bedrooms">Спальни</label>
+            <input
+              id="bedrooms"
+              type="number"
+              min="0"
+              max="20"
+              value="2"
+              required
+            >
+          </div>
+
+        </div>
+
+        <div class="section-label">
+          Удобства и оснащение
+        </div>
+
+        <div class="toggles">
+
+          <label class="toggle">
+            <input type="checkbox" id="garden">
+            Сад
+          </label>
+
+          <label class="toggle">
+            <input type="checkbox" id="balcony_yes" checked>
+            Балкон
+          </label>
+
+          <label class="toggle">
+            <input type="checkbox" id="parking_yes" checked>
+            Парковка
+          </label>
+
+          <label class="toggle">
+            <input type="checkbox" id="furnished_yes" checked>
+            Меблировка
+          </label>
+
+          <label class="toggle">
+            <input type="checkbox" id="garage_yes">
+            Гараж
+          </label>
+
+          <label class="toggle">
+            <input type="checkbox" id="storage_yes" checked>
+            Кладовая
+          </label>
+
+        </div>
+
+        <button
+          class="submit"
+          id="submit"
+          type="submit"
+        >
+          Рассчитать стоимость →
+        </button>
+
+        <div
+          id="error"
+          role="alert"
+          aria-live="polite"
+        ></div>
+
+      </form>
+    </section>
+
+    <aside class="side">
+
+      <div class="result">
+
+        <div class="eyebrow">
+          AI prediction
+        </div>
+
+        <h2>Результат оценки</h2>
+
+        <div class="value" id="value">—</div>
+
+        <p class="hint" id="hint">
+          Укажите характеристики и нажмите
+          «Рассчитать стоимость».
+        </p>
+
+        <div class="status" id="status">
+          ● Ожидаем параметры квартиры
+        </div>
+
+      </div>
+
+      <div class="note">
+        <strong>Как работает оценка?</strong>
+
+        Ваши параметры передаются во Flask API,
+        который формирует входные признаки и вызывает
+        обученную ML-модель.
+
+        Это расчетная оценка, а не официальное
+        заключение оценщика.
+      </div>
+
+    </aside>
+
+  </div>
+
+  <div class="footer">
+    <span>
+      ESTATE / AI · ML Inference Microservice
+    </span>
+
+    <span>
+      Flask API · Pydantic · Machine Learning
+    </span>
+  </div>
+
+</main>
+
+<script>
+  // API requests go through Nginx.
+  // No direct localhost:5000 connection is required.
+
+  const API_ENDPOINTS = [
+    "/api/v1/predict",
+    "/pred/"
+  ];
+
+  const fields = [
+    "area",
+    "constraction_year",
+    "bedrooms",
+    "garden",
+    "balcony_yes",
+    "parking_yes",
+    "furnished_yes",
+    "garage_yes",
+    "storage_yes"
+  ];
+
+  const binary = new Set([
+    "garden",
+    "balcony_yes",
+    "parking_yes",
+    "furnished_yes",
+    "garage_yes",
+    "storage_yes"
+  ]);
+
+  const form = document.getElementById("form");
+  const button = document.getElementById("submit");
+  const error = document.getElementById("error");
+  const resultValue = document.getElementById("value");
+  const hint = document.getElementById("hint");
+  const status = document.getElementById("status");
+
+  async function requestPrediction(data) {
+
+    for (const endpoint of API_ENDPOINTS) {
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      // Fall back only when endpoint does not exist.
+      if (
+        response.status === 404 &&
+        endpoint !== API_ENDPOINTS.at(-1)
+      ) {
+        continue;
+      }
+
+      const body = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          body.error ||
+          body.message ||
+          `Ошибка API: HTTP ${response.status}`
+        );
+      }
+
+      return body;
+    }
+
+    throw new Error("Endpoint предсказания не найден.");
+  }
+
+  form.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    const data = Object.fromEntries(
+      fields.map((key) => [
+        key,
+        binary.has(key)
+          ? Number(document.getElementById(key).checked)
+          : Number(document.getElementById(key).value)
+      ])
+    );
+
+    button.disabled = true;
+    button.textContent = "Модель рассчитывает…";
+
+    error.textContent = "";
+    resultValue.textContent = "…";
+
+    status.textContent = "● Выполняется предсказание";
+
+    try {
+
+      const body = await requestPrediction(data);
+
+      // Support both API response formats.
+      const raw =
+        body.prediction ?? body["Model prediction"];
+
+      const value = Array.isArray(raw)
+        ? raw[0]
+        : raw;
+
+      if (
+        typeof value !== "number" ||
+        !Number.isFinite(value)
+      ) {
+        throw new Error(
+          "API вернул неожиданный формат предсказания"
+        );
+      }
+
+      resultValue.textContent = new Intl.NumberFormat(
+        "ru-RU",
+        {
+          maximumFractionDigits: 2
+        }
+      ).format(value);
+
+      hint.textContent =
+        "Прогноз ML-модели в единицах измерения " +
+        "целевой переменной (валюта не указана).";
+
+      status.textContent = "● Предсказание получено";
+
+    } catch (e) {
+
+      console.error("Prediction error:", e);
+
+      if (e instanceof TypeError) {
+        error.textContent =
+          "Не удалось подключиться к API. " +
+          "Проверьте Docker и Nginx.";
+      } else {
+        error.textContent = e.message;
+      }
+
+      resultValue.textContent = "—";
+      status.textContent = "● Ошибка запроса";
+
+    } finally {
+
+      button.disabled = false;
+
+      button.textContent = "Рассчитать стоимость →";
+    }
+  });
+</script>
+
 </body>
 </html>

@@ -10,6 +10,7 @@ Usage:
 """
 
 from flask import Flask
+from flask_cors import CORS
 from loguru import logger
 
 from api.health import bp as health_bp
@@ -22,16 +23,22 @@ def create_app(load_model=True):
 
     app.config["MAX_CONTENT_LENGTH"] = 16 * 1024
 
-    from flask_cors import CORS
+    
 
     CORS(
         app,
         resources={
-            r"/api/*": {
-                "origins": ["http://localhost:3000"]
+            r"/*": {
+                "origins": [
+                    "http://localhost:3000",
+                    "http://127.0.0.1:3000",
+                ],
+                "methods": ["GET", "POST", "OPTIONS"],
+                "allow_headers": ["Content-Type"],
             }
         },
     )
+
 
     app.register_blueprint(health_bp)
     app.register_blueprint(prediction_bp)
