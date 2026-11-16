@@ -22,11 +22,9 @@ def create_app(load_model=True):
     from api.health import bp as health_bp
     from api.prediction import bp as prediction_bp
     
-
     app.register_blueprint(health_bp)
     app.register_blueprint(prediction_bp)
     
-
     if load_model:
         from services import initialize_model
         initialize_model()

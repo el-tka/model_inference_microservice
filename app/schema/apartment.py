@@ -1,7 +1,5 @@
 """ The schema for apartment."""
 
-from datetime import date
-
 from pydantic import BaseModel, Field
 
 

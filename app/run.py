@@ -36,7 +36,6 @@ def create_app(load_model=True):
     app.register_blueprint(health_bp)
     app.register_blueprint(prediction_bp)
 
-    
     if load_model:
         initialize_model()
 
